@@ -3,31 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>발주 수량 정리</title>
+<title>에이블리 발주 관리</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
 header{background:#fff;border-bottom:0.5px solid #e0e0db;padding:0 2rem;height:56px;display:flex;align-items:center;gap:12px}
 header h1{font-size:15px;font-weight:500}
-header span{font-size:12px;color:#888}
-.container{max-width:960px;margin:0 auto;padding:2rem 1.5rem}
-.drop{border:1.5px dashed #ccc;border-radius:12px;padding:2.5rem;text-align:center;cursor:pointer;transition:background .15s;background:#fff;margin-bottom:1.5rem}
+.main-tabs{display:flex;background:#fff;border-bottom:0.5px solid #e0e0db;padding:0 2rem}
+.main-tab{font-size:14px;padding:12px 20px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-weight:500}
+.main-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
+.page{display:none;padding:1.5rem 2rem;max-width:1000px;margin:0 auto}
+.page.active{display:block}
+.drop{border:1.5px dashed #ccc;border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all .15s;background:#fff;margin-bottom:1.25rem}
 .drop:hover{background:#f9f9f7;border-color:#aaa}
+.drop.has-file{border-color:#2d6fc9;background:#f0f5ff}
 .drop input[type=file]{display:none}
-.drop-icon{font-size:32px;margin-bottom:.5rem}
-.drop-title{font-size:15px;font-weight:500;margin-bottom:4px}
+.drop-icon{font-size:28px;margin-bottom:.5rem}
+.drop-title{font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:4px}
 .drop-sub{font-size:13px;color:#888}
-.tabs{display:flex;border-bottom:0.5px solid #e0e0db;margin-bottom:1.25rem}
-.tab{font-size:13px;padding:8px 18px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
-.tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:500}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.5rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.25rem}
 .stat{background:#fff;border-radius:8px;padding:.75rem 1rem;border:0.5px solid #e8e8e4}
 .stat-label{font-size:11px;color:#888;margin-bottom:4px}
 .stat-value{font-size:22px;font-weight:500}
+.sub-tabs{display:flex;border-bottom:0.5px solid #e0e0db;margin-bottom:1.25rem}
+.sub-tab{font-size:13px;padding:7px 16px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
+.sub-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:500}
 .tbl-wrap{background:#fff;border-radius:12px;border:0.5px solid #e8e8e4;overflow:hidden;overflow-x:auto}
 table{border-collapse:collapse;font-size:13px;min-width:400px}
-table.design-tbl{width:100%}
-table.type-tbl{width:100%}
+table.w100{width:100%}
 td{padding:6px 10px;border-bottom:0.5px solid #f0f0ec;color:#1a1a1a;vertical-align:middle;white-space:nowrap}
 tr.design-first td{border-top:1.5px solid #e0e0db}
 .design-cell{font-weight:500;border-right:0.5px solid #f0f0ec;position:relative;padding-left:14px}
@@ -38,159 +41,151 @@ tr.design-first td{border-top:1.5px solid #e0e0db}
 .center{text-align:center}
 .muted{color:#888}
 .tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;margin-right:6px;vertical-align:middle;white-space:nowrap;font-weight:500}
-#result{display:none}
+.card{background:#fff;border-radius:14px;border:0.5px solid #e8e8e4;padding:1.5rem;margin-bottom:1rem}
+.card-title{font-size:12px;font-weight:500;color:#888;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em}
+.btn{width:100%;padding:12px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
+.btn:hover{background:#333}
+.btn:disabled{background:#aaa;cursor:not-allowed}
+.result-box{border-radius:10px;padding:1rem 1.25rem;font-size:13px;margin-top:1rem;display:none}
+.result-box.success{background:#e8fbe8;color:#1a6a1a;border:0.5px solid #b0ddb0}
+.result-box.error{background:#fbe8e8;color:#8a1a1a;border:0.5px solid #ddb0b0}
 </style>
 </head>
 <body>
-<header>
-  <h1>발주 수량 정리</h1>
-  <span>에이블리 발주 엑셀 파일 분석기</span>
-</header>
-<div class="container">
-  <div class="drop" id="dropZone">
+<header><h1>에이블리 발주 관리</h1></header>
+
+<div class="main-tabs">
+  <button class="main-tab active" onclick="switchMain(this,'order')">📊 발주 수량 정리</button>
+  <button class="main-tab" onclick="switchMain(this,'delivery')">📦 택배 변환</button>
+</div>
+
+<!-- 발주 수량 정리 -->
+<div class="page active" id="page-order">
+  <div class="drop" id="orderDrop">
     <div class="drop-icon">📂</div>
     <div class="drop-title">발주 엑셀 파일 업로드</div>
     <div class="drop-sub">클릭하거나 파일을 드래그하세요 (.xlsx)</div>
-    <input type="file" id="fileInput" accept=".xlsx,.xls">
+    <input type="file" id="orderFile" accept=".xlsx,.xls">
   </div>
-  <div id="result">
-    <div class="stats" id="statsBar"></div>
-    <div class="tabs">
-      <button class="tab active" onclick="switchTab(this,'design')">디자인 / 색상</button>
-      <button class="tab" onclick="switchTab(this,'type')">옷종류 / 색상 / 사이즈</button>
+  <div id="orderResult" style="display:none">
+    <div class="stats" id="orderStats"></div>
+    <div class="sub-tabs">
+      <button class="sub-tab active" onclick="switchSub(this,'design')">디자인 / 색상</button>
+      <button class="sub-tab" onclick="switchSub(this,'type')">옷종류 / 색상 / 사이즈</button>
     </div>
-    <div class="tbl-wrap"><div id="tableWrap"></div></div>
+    <div class="tbl-wrap"><div id="orderTable"></div></div>
   </div>
+</div>
+
+<!-- 택배 변환 -->
+<div class="page" id="page-delivery">
+  <div class="card">
+    <div class="card-title">1. 발주 파일 선택</div>
+    <div class="drop" id="deliveryDrop">
+      <div class="drop-icon">📦</div>
+      <div class="drop-title">에이블리 발주 엑셀 파일</div>
+      <div class="drop-sub">클릭하거나 파일을 드래그하세요 (.xlsx)</div>
+      <input type="file" id="deliveryFile" accept=".xlsx,.xls">
+    </div>
+  </div>
+  <button class="btn" id="convertBtn" onclick="convertDelivery()" disabled>변환 후 다운로드</button>
+  <div class="result-box" id="deliveryResult"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
-let rows=[], currentTab='design';
-const dropZone=document.getElementById('dropZone');
-const PALETTE=[
-  {bg:'#e8f0fb',color:'#2d6fc9',bar:'#2d6fc9'},
-  {bg:'#fce8f3',color:'#c9367a',bar:'#c9367a'},
-  {bg:'#e8fbe8',color:'#2a8a2a',bar:'#2a8a2a'},
-  {bg:'#fff3e0',color:'#c97a00',bar:'#c97a00'},
-  {bg:'#f3e8fb',color:'#7a2dc9',bar:'#7a2dc9'},
-  {bg:'#e8faf8',color:'#1a8a7a',bar:'#1a8a7a'},
-  {bg:'#fbe8e8',color:'#c92d2d',bar:'#c92d2d'},
-  {bg:'#f5fbe8',color:'#6a8a1a',bar:'#6a8a1a'},
-];
-const categoryColorMap={};
-let colorIdx=0;
+function switchMain(btn,page){document.querySelectorAll('.main-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('page-'+page).classList.add('active');}
 
-function getCategoryColor(typeKey){
-  const base=typeKey.replace(/\(.*\)/,'').trim();
-  if(!categoryColorMap[base]){categoryColorMap[base]=PALETTE[colorIdx%PALETTE.length];colorIdx++;}
-  return categoryColorMap[base];
-}
-function tagHtml(typeKey){
-  const c=getCategoryColor(typeKey);
-  return `<span class="tag" style="background:${c.bg};color:${c.color}">${typeKey}</span>`;
-}
-function bindDrop(){
-  dropZone.addEventListener('click',()=>document.getElementById('fileInput').click());
-  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.style.background='#f0f0ec';});
-  dropZone.addEventListener('dragleave',()=>{dropZone.style.background='';});
-  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.style.background='';processFile(e.dataTransfer.files[0]);});
-  document.getElementById('fileInput').addEventListener('change',e=>processFile(e.target.files[0]));
-}
-bindDrop();
-
-function processFile(file){
-  Object.keys(categoryColorMap).forEach(k=>delete categoryColorMap[k]);
-  colorIdx=0;
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const wb=XLSX.read(e.target.result,{type:'array'});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    rows=XLSX.utils.sheet_to_json(ws);
-    renderAll(file.name);
-  };
-  reader.readAsArrayBuffer(file);
-}
-function splitCode(code){const c=String(code||'');const idx=c.indexOf('_');if(idx<0)return{type:c,design:c};return{type:c.slice(0,idx),design:c.slice(idx+1)};}
-function is11Product(code){return String(code||'').includes('1+1');}
-function isFleecePart(str){return /기모|노기모|fleece/i.test(str);}
-function parseOption(optStr,flag11){
-  const str=String(optStr||'').trim();
-  const parts=str.split('/').map(p=>p.trim());
-  if(flag11&&parts.length>=6&&!isFleecePart(parts[0]))return[{fleece:null,design:parts[0],color:parts[1],size:parts[2]},{fleece:null,design:parts[3],color:parts[4],size:parts[5]}];
-  if(parts.length>=3&&isFleecePart(parts[0])){const fleece=parts[0].split('_')[0].trim();const color=parts[1].split('_')[0].trim();const size=parts[2].trim();return[{fleece,design:null,color,size}];}
+const PALETTE=[{bg:'#e8f0fb',color:'#2d6fc9',bar:'#2d6fc9'},{bg:'#fce8f3',color:'#c9367a',bar:'#c9367a'},{bg:'#e8fbe8',color:'#2a8a2a',bar:'#2a8a2a'},{bg:'#fff3e0',color:'#c97a00',bar:'#c97a00'},{bg:'#f3e8fb',color:'#7a2dc9',bar:'#7a2dc9'},{bg:'#e8faf8',color:'#1a8a7a',bar:'#1a8a7a'},{bg:'#fbe8e8',color:'#c92d2d',bar:'#c92d2d'},{bg:'#f5fbe8',color:'#6a8a1a',bar:'#6a8a1a'}];
+const catColorMap={};let colorIdx=0;
+function resetColors(){Object.keys(catColorMap).forEach(k=>delete catColorMap[k]);colorIdx=0;}
+function getCatColor(tk){const base=tk.replace(/\(.*\)/,'').trim();if(!catColorMap[base]){catColorMap[base]=PALETTE[colorIdx%PALETTE.length];colorIdx++;}return catColorMap[base];}
+function tagHtml(tk){const c=getCatColor(tk);return `<span class="tag" style="background:${c.bg};color:${c.color}">${tk}</span>`;}
+function splitCode(code){const c=String(code||'');const i=c.indexOf('_');if(i<0)return{type:c,design:c};return{type:c.slice(0,i),design:c.slice(i+1)};}
+function is11(code){return String(code||'').includes('1+1');}
+function isFleece(str){return /기모|노기모|fleece/i.test(str);}
+function parseOpt(optStr,f11){
+  const str=String(optStr||'').trim();const parts=str.split('/').map(p=>p.trim());
+  if(f11&&parts.length>=6&&!isFleece(parts[0]))return[{fleece:null,design:parts[0],color:parts[1],size:parts[2]},{fleece:null,design:parts[3],color:parts[4],size:parts[5]}];
+  if(parts.length>=3&&isFleece(parts[0])){const fl=parts[0].split('_')[0].trim();const co=parts[1].split('_')[0].trim();return[{fleece:fl,design:null,color:co,size:parts[2].trim()}];}
   const color=(parts[0]||'').split('_')[0].trim();const size=(parts[1]||'').trim();
   return[{fleece:null,design:null,color,size}];
 }
-function renderAll(fname){
-  let totalQty=0;const designs=new Set(),types=new Set();
-  rows.forEach(r=>{totalQty+=Number(r['수량'])||1;designs.add(r['상품명']);types.add(splitCode(r['판매자 상품코드']).type);});
-  document.getElementById('statsBar').innerHTML=`
-    <div class="stat"><div class="stat-label">총 수량</div><div class="stat-value">${totalQty}</div></div>
-    <div class="stat"><div class="stat-label">디자인 수</div><div class="stat-value">${designs.size}</div></div>
-    <div class="stat"><div class="stat-label">옷 종류</div><div class="stat-value">${types.size}</div></div>
-    <div class="stat"><div class="stat-label">주문 행</div><div class="stat-value">${rows.length}</div></div>`;
-  dropZone.innerHTML=`<div class="drop-icon">✅</div><div class="drop-title">${fname}</div><div class="drop-sub">다른 파일을 분석하려면 클릭</div><input type="file" id="fileInput" accept=".xlsx,.xls">`;
-  bindDrop();
-  document.getElementById('result').style.display='block';
-  renderTab();
+function setupDrop(dropEl,fileInput,onFile){
+  dropEl.addEventListener('click',()=>fileInput.click());
+  dropEl.addEventListener('dragover',e=>{e.preventDefault();dropEl.style.background='#f0f0ec';});
+  dropEl.addEventListener('dragleave',()=>{dropEl.style.background='';});
+  dropEl.addEventListener('drop',e=>{e.preventDefault();dropEl.style.background='';if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0]);});
+  fileInput.addEventListener('change',e=>{if(e.target.files[0])onFile(e.target.files[0]);});
 }
-function switchTab(btn,tab){currentTab=tab;document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderTab();}
-function renderTab(){currentTab==='design'?renderDesign():renderType();}
+function readExcel(file,cb){
+  const reader=new FileReader();
+  reader.onload=e=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});cb(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]),wb);};
+  reader.readAsArrayBuffer(file);
+}
+function markDrop(dropEl,fname){dropEl.classList.add('has-file');dropEl.querySelector('.drop-title').textContent=fname;dropEl.querySelector('.drop-sub').textContent='다른 파일을 선택하려면 클릭';}
+
+// ── 발주 수량 정리 ──
+let orderRows=[],orderSubTab='design';
+setupDrop(document.getElementById('orderDrop'),document.getElementById('orderFile'),file=>{
+  readExcel(file,rows=>{
+    orderRows=rows;resetColors();
+    let totalQty=0;const designs=new Set(),types=new Set();
+    rows.forEach(r=>{totalQty+=Number(r['수량'])||1;designs.add(r['상품명']);types.add(splitCode(r['판매자 상품코드']).type);});
+    document.getElementById('orderStats').innerHTML=`
+      <div class="stat"><div class="stat-label">총 수량</div><div class="stat-value">${totalQty}</div></div>
+      <div class="stat"><div class="stat-label">디자인 수</div><div class="stat-value">${designs.size}</div></div>
+      <div class="stat"><div class="stat-label">옷 종류</div><div class="stat-value">${types.size}</div></div>
+      <div class="stat"><div class="stat-label">주문 행</div><div class="stat-value">${rows.length}</div></div>`;
+    markDrop(document.getElementById('orderDrop'),file.name);
+    document.getElementById('orderResult').style.display='block';
+    renderOrderTab();
+  });
+});
+function switchSub(btn,tab){orderSubTab=tab;document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderOrderTab();}
+function renderOrderTab(){orderSubTab==='design'?renderDesign():renderType();}
 
 function renderDesign(){
   const map={};
-  rows.forEach(r=>{
-    const qty=Number(r['수량'])||1;const flag11=is11Product(r['판매자 상품코드']);
+  orderRows.forEach(r=>{
+    const qty=Number(r['수량'])||1;const f11=is11(r['판매자 상품코드']);
     const{type,design:cd}=splitCode(r['판매자 상품코드']);
-    parseOption(r['옵션 정보'],flag11).forEach(opt=>{
+    parseOpt(r['옵션 정보'],f11).forEach(opt=>{
       const dn=opt.design||cd;const key=type+'|'+dn;
       if(!map[key])map[key]={type,design:dn,colors:{}};
       map[key].colors[opt.color]=(map[key].colors[opt.color]||0)+qty;
     });
   });
-  let html=`<table class="design-tbl" id="designTable"><colgroup><col id="col-design" style="width:240px;min-width:80px"><col style="min-width:60px"><col style="width:80px"></colgroup><tbody>`;
+  let html=`<table class="w100" id="designTable"><colgroup><col id="col-design" style="width:240px;min-width:80px"><col style="min-width:60px"><col style="width:80px"></colgroup><tbody>`;
   Object.values(map).sort((a,b)=>a.type.localeCompare(b.type,'ko')||a.design.localeCompare(b.design,'ko')).forEach(({type,design,colors})=>{
-    const c=getCategoryColor(type);
-    const cl=Object.entries(colors);
+    const c=getCatColor(type);const cl=Object.entries(colors);
     cl.forEach(([color,qty],i)=>{
       const isFirst=i===0;
       html+=`<tr class="${isFirst?'design-first':''}">`;
-      if(isFirst){
-        html+=`<td class="design-cell" rowspan="${cl.length}" style="border-right:0.5px solid #f0f0ec">
-          <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:${c.bar}"></span>
-          ${tagHtml(type)}${design}</td>`;
-      }
+      if(isFirst)html+=`<td class="design-cell" rowspan="${cl.length}" style="border-right:0.5px solid #f0f0ec"><span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:${c.bar}"></span>${tagHtml(type)}${design}</td>`;
       html+=`<td class="muted" style="${isFirst?'border-top:1.5px solid #e0e0db':''}">${color}</td>`;
       html+=`<td style="text-align:right;${isFirst?'border-top:1.5px solid #e0e0db':''}">${qty}</td></tr>`;
     });
   });
   html+=`</tbody></table>`;
-  document.getElementById('tableWrap').innerHTML=html;
+  document.getElementById('orderTable').innerHTML=html;
   initResize();
 }
-
 function initResize(){
-  const table=document.getElementById('designTable');if(!table)return;
-  const firstTd=table.querySelector('td.design-cell');if(!firstTd)return;
-  const handle=document.createElement('div');
-  handle.style.cssText='position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;z-index:10;';
-  firstTd.appendChild(handle);
-  let startX,startW;
-  handle.addEventListener('mousedown',e=>{
-    startX=e.clientX;startW=parseInt(document.getElementById('col-design').style.width)||240;e.preventDefault();
-    const onMove=e=>{document.getElementById('col-design').style.width=Math.max(80,startW+(e.clientX-startX))+'px';};
-    const onUp=()=>{document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);};
-    document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+  const td=document.querySelector('td.design-cell');if(!td)return;
+  const h=document.createElement('div');h.style.cssText='position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;z-index:10';
+  td.appendChild(h);let sx,sw;
+  h.addEventListener('mousedown',e=>{sx=e.clientX;sw=parseInt(document.getElementById('col-design').style.width)||240;e.preventDefault();
+    const mv=e=>{document.getElementById('col-design').style.width=Math.max(80,sw+(e.clientX-sx))+'px';};
+    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
+    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
   });
 }
-
 function renderType(){
   const sizeOrder=['XS','S','M','L','XL','2XL','3XL'];const map={};
-  rows.forEach(r=>{
-    const{type}=splitCode(r['판매자 상품코드']);const qty=Number(r['수량'])||1;
-    const flag11=is11Product(r['판매자 상품코드']);
-    parseOption(r['옵션 정보'],flag11).forEach(opt=>{
+  orderRows.forEach(r=>{
+    const{type}=splitCode(r['판매자 상품코드']);const qty=Number(r['수량'])||1;const f11=is11(r['판매자 상품코드']);
+    parseOpt(r['옵션 정보'],f11).forEach(opt=>{
       const tk=opt.fleece?`${type}(${opt.fleece})`:type;
       if(!map[tk])map[tk]={};if(!map[tk][opt.color])map[tk][opt.color]={};
       map[tk][opt.color][opt.size]=(map[tk][opt.color][opt.size]||0)+qty;
@@ -199,30 +194,66 @@ function renderType(){
   const allSizes=new Set();
   Object.values(map).forEach(c=>Object.values(c).forEach(s=>Object.keys(s).forEach(k=>allSizes.add(k))));
   const sizes=[...allSizes].sort((a,b)=>{const ai=sizeOrder.indexOf(a),bi=sizeOrder.indexOf(b);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return a.localeCompare(b);});
-  const headerRow=()=>`<tr class="col-header"><td>옷 종류</td><td>색상</td>${sizes.map(s=>`<td class="center">${s}</td>`).join('')}<td style="text-align:right">소계</td></tr>`;
-  let html=`<table class="type-tbl"><tbody>`;
+  const hdr=()=>`<tr class="col-header"><td>옷 종류</td><td>색상</td>${sizes.map(s=>`<td class="center">${s}</td>`).join('')}<td style="text-align:right">소계</td></tr>`;
+  let html=`<table class="w100"><tbody>`;
   Object.keys(map).sort((a,b)=>a.localeCompare(b,'ko')).forEach((tk,idx)=>{
-    const colors=map[tk];const typeTotal=Object.values(colors).reduce((s,sz)=>s+Object.values(sz).reduce((a,b)=>a+b,0),0);
-    const typeSize={};const cl=Object.entries(colors);const c=getCategoryColor(tk);
+    const colors=map[tk];const total=Object.values(colors).reduce((s,sz)=>s+Object.values(sz).reduce((a,b)=>a+b,0),0);
+    const tsz={};const cl=Object.entries(colors);const c=getCatColor(tk);
     if(idx>0)html+=`<tr class="spacer"><td colspan="${2+sizes.length+1}"></td></tr>`;
-    html+=headerRow();
-    let first=true;
+    html+=hdr();let first=true;
     cl.forEach(([color,szMap])=>{
-      const ct=Object.values(szMap).reduce((a,b)=>a+b,0);
-      html+=`<tr>`;
-      if(first){
-        html+=`<td rowspan="${cl.length+1}" style="font-weight:500;border-right:0.5px solid #f0f0ec;vertical-align:middle;color:${c.color};padding-left:14px;position:relative">
-          <span style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:${c.bar}"></span>${tk}</td>`;
-        first=false;
-      }
+      const ct=Object.values(szMap).reduce((a,b)=>a+b,0);html+=`<tr>`;
+      if(first){html+=`<td rowspan="${cl.length+1}" style="font-weight:500;border-right:0.5px solid #f0f0ec;vertical-align:middle;color:${c.color};padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:${c.bar}"></span>${tk}</td>`;first=false;}
       html+=`<td class="muted">${color}</td>`;
-      sizes.forEach(s=>{const v=szMap[s]||0;typeSize[s]=(typeSize[s]||0)+v;html+=`<td class="center">${v||''}</td>`;});
+      sizes.forEach(s=>{const v=szMap[s]||0;tsz[s]=(tsz[s]||0)+v;html+=`<td class="center">${v||''}</td>`;});
       html+=`<td style="text-align:right;font-weight:500">${ct}</td></tr>`;
     });
-    html+=`<tr class="subtotal"><td class="muted" style="text-align:right">소계</td>${sizes.map(s=>`<td class="center">${typeSize[s]||''}</td>`).join('')}<td style="text-align:right">${typeTotal}</td></tr>`;
+    html+=`<tr class="subtotal"><td class="muted" style="text-align:right">소계</td>${sizes.map(s=>`<td class="center">${tsz[s]||''}</td>`).join('')}<td style="text-align:right">${total}</td></tr>`;
   });
   html+=`</tbody></table>`;
-  document.getElementById('tableWrap').innerHTML=html;
+  document.getElementById('orderTable').innerHTML=html;
+}
+
+// ── 택배 변환 ──
+let deliveryRows=[];
+setupDrop(document.getElementById('deliveryDrop'),document.getElementById('deliveryFile'),file=>{
+  readExcel(file,rows=>{
+    deliveryRows=rows;
+    markDrop(document.getElementById('deliveryDrop'),file.name);
+    document.getElementById('convertBtn').disabled=false;
+  });
+});
+
+function convertDelivery(){
+  const btn=document.getElementById('convertBtn');
+  const resultEl=document.getElementById('deliveryResult');
+  btn.disabled=true;btn.textContent='변환 중...';resultEl.style.display='none';
+  try{
+    const required=['수취인명','수취인 연락처','우편번호','배송지 주소','판매자 상품코드','옵션 정보'];
+    const cols=Object.keys(deliveryRows[0]||{});
+    const missing=required.filter(c=>!cols.includes(c));
+    if(missing.length)throw new Error(`필수 컬럼 없음: ${missing.join(', ')}`);
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
+    function cleanOpt(opt){return String(opt).split('/').map(p=>{p=p.trim();return p.includes('_')?p.split('_')[0].trim():p;}).join('/');}
+    const headers=['예약구분','집하예정일','받는분성명','받는분전화번호','받는분기타연락처','받는분우편번호','받는분주소(전체, 분할)','운송장번호','고객주문번호','품목명','박스수량','박스타입','기본운임','배송메세지1','배송메세지2','품목명.1','운임구분'];
+    const wsData=[headers];
+    deliveryRows.forEach(r=>{
+      const memo=(!r['배송 메모']||String(r['배송 메모'])==='nan')?'':String(r['배송 메모']);
+      wsData.push(['',today,r['수취인명'],String(r['수취인 연락처']),'',String(r['우편번호']),r['배송지 주소'],'','',`${r['판매자 상품코드']}/${cleanOpt(r['옵션 정보'])}`,1,'극소',2000,memo,'','','']);
+    });
+    const wb2=XLSX.utils.book_new();
+    const ws2=XLSX.utils.aoa_to_sheet(wsData);
+    ws2['!cols']=[8,12,12,16,16,12,45,14,14,45,8,8,10,20,20,10,10].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb2,ws2,'택배발송');
+    const outName=today+'_택배발송.xlsx';
+    XLSX.writeFile(wb2,outName);
+    resultEl.className='result-box success';
+    resultEl.innerHTML=`✅ 변환 완료! <b>${deliveryRows.length}건</b> → <b>${outName}</b> 다운로드됨`;
+  }catch(e){
+    resultEl.className='result-box error';
+    resultEl.innerHTML=`❌ 오류: ${e.message}`;
+  }
+  btn.disabled=false;btn.textContent='변환 후 다운로드';resultEl.style.display='block';
 }
 </script>
 </body>
