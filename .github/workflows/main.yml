@@ -1,0 +1,31 @@
+name: Build Windows EXE
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 설치
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 의존성 설치
+        run: pip install pyinstaller pywebview
+
+      - name: EXE 빌드
+        run: pyinstaller --onefile --windowed --name "발주수량정리" --hidden-import webview.platforms.winforms --hidden-import clr app.py
+
+      - name: 결과물 업로드
+        uses: actions/upload-artifact@v4
+        with:
+          name: 발주수량정리-exe
+          path: dist/발주수량정리.exe
+          retention-days: 30
