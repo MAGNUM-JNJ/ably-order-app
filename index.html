@@ -237,7 +237,12 @@ function convertDelivery(){
     function cleanOpt(opt){return String(opt).split('/').map(p=>{p=p.trim();return p.includes('_')?p.split('_')[0].trim():p;}).join('/');}
     const headers=['예약구분','집하예정일','받는분성명','받는분전화번호','받는분기타연락처','받는분우편번호','받는분주소(전체, 분할)','운송장번호','고객주문번호','품목명','박스수량','박스타입','기본운임','배송메세지1','배송메세지2','품목명.1','운임구분'];
     const wsData=[headers];
-    deliveryRows.forEach(r=>{
+    const sorted=[...deliveryRows].sort((a,b)=>{
+      const pa=`${a['판매자 상품코드']}/${cleanOpt(a['옵션 정보'])}`;
+      const pb=`${b['판매자 상품코드']}/${cleanOpt(b['옵션 정보'])}`;
+      return pa.localeCompare(pb,'ko');
+    });
+    sorted.forEach(r=>{
       const memo=(!r['배송 메모']||String(r['배송 메모'])==='nan')?'':String(r['배송 메모']);
       wsData.push(['',today,r['수취인명'],String(r['수취인 연락처']),'',String(r['우편번호']),r['배송지 주소'],'','',`${r['판매자 상품코드']}/${cleanOpt(r['옵션 정보'])}`,1,'극소',2000,memo,'','','']);
     });
