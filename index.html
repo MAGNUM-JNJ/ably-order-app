@@ -57,6 +57,7 @@ tr.design-first td{border-top:1.5px solid #e0e0db}
 <div class="main-tabs">
   <button class="main-tab active" onclick="switchMain(this,'order')">📊 발주 수량 정리</button>
   <button class="main-tab" onclick="switchMain(this,'delivery')">📦 택배 변환</button>
+  <button class="main-tab" onclick="switchMain(this,'invoice')">🔖 송장 입력</button>
 </div>
 
 <!-- 발주 수량 정리 -->
@@ -90,6 +91,49 @@ tr.design-first td{border-top:1.5px solid #e0e0db}
   </div>
   <button class="btn" id="convertBtn" onclick="convertDelivery()" disabled>변환 후 다운로드</button>
   <div class="result-box" id="deliveryResult"></div>
+</div>
+
+<!-- 송장 입력 -->
+<div class="page" id="page-invoice">
+  <div class="card">
+    <div class="card-title">1. 발주 파일 선택</div>
+    <div class="drop" id="invOrderDrop">
+      <div class="drop-icon">📋</div>
+      <div class="drop-title">에이블리 발주 엑셀 파일</div>
+      <div class="drop-sub">클릭하거나 파일을 드래그하세요 (.xlsx)</div>
+      <input type="file" id="invOrderFile" accept=".xlsx,.xls">
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">2. 송장 파일 선택</div>
+    <div class="drop" id="invInvoiceDrop">
+      <div class="drop-icon">🔖</div>
+      <div class="drop-title">택배사 송장 엑셀 파일</div>
+      <div class="drop-sub">클릭하거나 파일을 드래그하세요 (.xlsx)</div>
+      <input type="file" id="invInvoiceFile" accept=".xlsx,.xls">
+    </div>
+  </div>
+  <div class="card" id="invMatchCard" style="display:none">
+    <div class="card-title">3. 매칭 키 확인</div>
+    <div style="font-size:13px;color:#555;margin-bottom:8px">발주 파일과 송장 파일의 공통 항목으로 매칭합니다.</div>
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px">
+        <label style="font-size:12px;color:#888">발주 파일 키</label>
+        <select id="invOrderKey" style="padding:5px 8px;border:.5px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit"></select>
+      </div>
+      <div style="font-size:16px;color:#ccc">↔</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <label style="font-size:12px;color:#888">송장 파일 키</label>
+        <select id="invInvoiceKey" style="padding:5px 8px;border:.5px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit"></select>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <label style="font-size:12px;color:#888">송장번호 컬럼</label>
+        <select id="invInvoiceNumCol" style="padding:5px 8px;border:.5px solid #ddd;border-radius:6px;font-size:12px;font-family:inherit"></select>
+      </div>
+    </div>
+  </div>
+  <button class="btn" id="invMergeBtn" onclick="mergeInvoice()" disabled>송장번호 입력 후 다운로드</button>
+  <div class="result-box" id="invResult"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -259,6 +303,132 @@ function convertDelivery(){
     resultEl.innerHTML=`❌ 오류: ${e.message}`;
   }
   btn.disabled=false;btn.textContent='변환 후 다운로드';resultEl.style.display='block';
+}
+
+// ── 송장 입력 ──
+// 에이블리 발송관리 파일: 2번째 시트의 '송장번호' 컬럼에 입력
+// 송장 파일: '수취인 연락처' → '송장' 컬럼 매핑
+let invOrderWb=null, invOrderRows=[], invOrderSheetName='';
+let invInvoiceRows=[], invOrderCols=[], invInvoiceCols=[];
+
+setupDrop(document.getElementById('invOrderDrop'), document.getElementById('invOrderFile'), file=>{
+  const reader=new FileReader();
+  reader.onload=e=>{
+    invOrderWb = XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    // 두 번째 시트(인덱스 1) 사용, 없으면 첫 번째
+    const sheetIdx = invOrderWb.SheetNames.length > 1 ? 1 : 0;
+    invOrderSheetName = invOrderWb.SheetNames[sheetIdx];
+    invOrderRows = XLSX.utils.sheet_to_json(invOrderWb.Sheets[invOrderSheetName]);
+    invOrderCols = Object.keys(invOrderRows[0]||{});
+    markDrop(document.getElementById('invOrderDrop'), file.name + ` (시트: ${invOrderSheetName})`);
+    updateInvMatchCard();
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+setupDrop(document.getElementById('invInvoiceDrop'), document.getElementById('invInvoiceFile'), file=>{
+  readExcel(file, rows=>{
+    invInvoiceRows=rows;
+    invInvoiceCols=Object.keys(rows[0]||{});
+    markDrop(document.getElementById('invInvoiceDrop'), file.name);
+    updateInvMatchCard();
+  });
+});
+
+function updateInvMatchCard(){
+  if(!invOrderRows.length || !invInvoiceRows.length) return;
+
+  // 발주 키 셀렉트
+  const orderKeyEl = document.getElementById('invOrderKey');
+  orderKeyEl.innerHTML = invOrderCols.map(c=>`<option value="${c}" ${c==='수취인 연락처'?'selected':''}>${c}</option>`).join('');
+
+  // 송장 키 셀렉트
+  const invoiceKeyEl = document.getElementById('invInvoiceKey');
+  invoiceKeyEl.innerHTML = invInvoiceCols.map(c=>`<option value="${c}" ${c==='수취인 연락처'?'selected':''}>${c}</option>`).join('');
+
+  // 송장번호 컬럼 셀렉트 (송장 파일에서)
+  const invoiceNumEl = document.getElementById('invInvoiceNumCol');
+  invoiceNumEl.innerHTML = invInvoiceCols.map(c=>`<option value="${c}" ${(c==='송장'||c==='송장번호')?'selected':''}>${c}</option>`).join('');
+
+  // 발송관리 파일의 송장번호 대상 컬럼 안내
+  const hasSongjanCol = invOrderCols.includes('송장번호');
+  document.getElementById('invMatchCard').style.display='block';
+  document.getElementById('invMatchCard').querySelector('div[style]').innerHTML =
+    hasSongjanCol
+      ? `✅ 발주 파일에서 <b>송장번호</b> 컬럼을 찾았어요. 매칭 후 해당 컬럼에 자동 입력됩니다.`
+      : `⚠ 발주 파일에서 송장번호 컬럼을 찾지 못했습니다. 마지막 열에 추가됩니다.`;
+
+  document.getElementById('invMergeBtn').disabled=false;
+}
+
+function mergeInvoice(){
+  const btn=document.getElementById('invMergeBtn');
+  const resultEl=document.getElementById('invResult');
+  btn.disabled=true; btn.textContent='처리 중...'; resultEl.style.display='none';
+
+  try{
+    const orderKey = document.getElementById('invOrderKey').value;
+    const invoiceKey = document.getElementById('invInvoiceKey').value;
+    const invoiceNumCol = document.getElementById('invInvoiceNumCol').value;
+
+    // 송장 파일에서 키→송장번호 맵 생성 (하이픈/공백 제거 후 매칭)
+    const invoiceMap = {};
+    invInvoiceRows.forEach(r=>{
+      const key = String(r[invoiceKey]||'').replace(/[-\s]/g,'');
+      const num = String(r[invoiceNumCol]||'').replace(/[^0-9]/g,'');
+      if(key && num && num!=='undefined' && num!=='nan') invoiceMap[key] = num;
+    });
+
+    let matched=0, unmatched=0;
+
+    // 발송관리 파일: 원본 워크북의 해당 시트를 직접 수정
+    const ws = invOrderWb.Sheets[invOrderSheetName];
+    const range = XLSX.utils.decode_range(ws['!ref']);
+
+    // 헤더 행에서 '수취인 연락처', '송장번호' 컬럼 인덱스 찾기
+    let orderKeyColIdx = -1, invoiceColIdx = -1;
+    for(let c=range.s.c; c<=range.e.c; c++){
+      const cell = ws[XLSX.utils.encode_cell({r:range.s.r, c})];
+      if(cell && cell.v === orderKey) orderKeyColIdx = c;
+      if(cell && cell.v === '송장번호') invoiceColIdx = c;
+    }
+
+    // 송장번호 컬럼이 없으면 마지막 열에 추가
+    if(invoiceColIdx < 0){
+      invoiceColIdx = range.e.c + 1;
+      ws[XLSX.utils.encode_cell({r:range.s.r, c:invoiceColIdx})] = {v:'송장번호', t:'s'};
+      range.e.c = invoiceColIdx;
+      ws['!ref'] = XLSX.utils.encode_range(range);
+    }
+
+    // 데이터 행 순회하며 송장번호 입력
+    for(let r=range.s.r+1; r<=range.e.r; r++){
+      if(orderKeyColIdx < 0) break;
+      const keyCell = ws[XLSX.utils.encode_cell({r, c:orderKeyColIdx})];
+      if(!keyCell) continue;
+      const key = String(keyCell.v||'').replace(/[-\s]/g,'');
+      const invNum = invoiceMap[key];
+      if(invNum){
+        ws[XLSX.utils.encode_cell({r, c:invoiceColIdx})] = {v:invNum, t:'s'};
+        matched++;
+      } else {
+        unmatched++;
+      }
+    }
+
+    // 원본 파일 구조 유지하여 저장 (모든 시트 포함)
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
+    const outName=`${today}_에이블리_발송_송장.xlsx`;
+    XLSX.writeFile(invOrderWb, outName);
+
+    resultEl.className='result-box success';
+    resultEl.innerHTML=`✅ 완료! 매칭 <b>${matched}건</b> / 미매칭 <b style="color:#c97a00">${unmatched}건</b><br><span style="font-size:12px">→ <b>${outName}</b> 다운로드됨 (원본 시트 구조 유지)</span>`;
+  }catch(e){
+    resultEl.className='result-box error';
+    resultEl.innerHTML=`❌ 오류: ${e.message}`;
+  }
+  btn.disabled=false; btn.textContent='송장번호 입력 후 다운로드';
+  resultEl.style.display='block';
 }
 </script>
 </body>
