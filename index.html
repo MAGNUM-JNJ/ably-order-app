@@ -6,58 +6,112 @@
 <title>에이블리 발주 관리</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f3;color:#1a1a1a;min-height:100vh}
-header{background:#fff;border-bottom:0.5px solid #e0e0db;padding:0 2rem;height:56px;display:flex;align-items:center;gap:12px}
-header h1{font-size:15px;font-weight:500}
-.main-tabs{display:flex;background:#fff;border-bottom:0.5px solid #e0e0db;padding:0 2rem}
-.main-tab{font-size:14px;padding:12px 20px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-weight:500}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f0ed;color:#1a1a1a;min-height:100vh}
+
+/* 헤더 */
+header{background:#1a1a1a;padding:0 2rem;height:52px;display:flex;align-items:center;gap:10px}
+header h1{font-size:14px;font-weight:500;color:#fff;letter-spacing:.02em}
+
+/* 메인 탭 */
+.main-tabs{display:flex;background:#fff;border-bottom:1px solid #e8e8e4;padding:0 2rem;gap:2px}
+.main-tab{font-size:13px;padding:11px 18px;border:none;background:none;cursor:pointer;color:#999;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-weight:500;transition:color .15s}
+.main-tab:hover{color:#555}
 .main-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
-.page{display:none;padding:1.5rem 2rem;max-width:1000px;margin:0 auto}
+
+/* 페이지 */
+.page{display:none;padding:1.5rem 2rem;max-width:1060px;margin:0 auto}
 .page.active{display:block}
-.drop{border:1.5px dashed #ccc;border-radius:12px;padding:2rem;text-align:center;cursor:pointer;transition:all .15s;background:#fff;margin-bottom:1.25rem}
-.drop:hover{background:#f9f9f7;border-color:#aaa}
-.drop.has-file{border-color:#2d6fc9;background:#f0f5ff}
+
+/* 드롭존 */
+.drop{border:1.5px dashed #d0d0cc;border-radius:10px;padding:1.75rem;text-align:center;cursor:pointer;transition:all .15s;background:#fff;margin-bottom:1.25rem}
+.drop:hover,.drop.drag-over{background:#f5f8ff;border-color:#6699dd}
+.drop.has-file{border-color:#4a90d9;background:#f5f8ff;border-style:solid}
 .drop input[type=file]{display:none}
-.drop-icon{font-size:28px;margin-bottom:.5rem}
-.drop-title{font-size:15px;font-weight:500;color:#1a1a1a;margin-bottom:4px}
-.drop-sub{font-size:13px;color:#888}
-.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:1.25rem}
-.stat{background:#fff;border-radius:8px;padding:.75rem 1rem;border:0.5px solid #e8e8e4}
-.stat-label{font-size:11px;color:#888;margin-bottom:4px}
-.stat-value{font-size:22px;font-weight:500}
-.sub-tabs{display:flex;border-bottom:0.5px solid #e0e0db;margin-bottom:1.25rem}
-.sub-tab{font-size:13px;padding:7px 16px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit}
-.sub-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a;font-weight:500}
-.tbl-wrap{background:#fff;border-radius:12px;border:0.5px solid #e8e8e4;overflow:hidden;overflow-x:auto}
+.drop-icon{font-size:24px;margin-bottom:6px;opacity:.7}
+.drop-title{font-size:14px;font-weight:500;color:#1a1a1a;margin-bottom:3px}
+.drop-sub{font-size:12px;color:#999}
+
+/* 통계 바 */
+.top-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:1.25rem;flex-wrap:wrap}
+.stats{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.stat{background:#fff;border-radius:8px;padding:.6rem 1rem;border:.5px solid #e8e8e4;min-width:90px}
+.stat-label{font-size:10px;color:#aaa;margin-bottom:3px;text-transform:uppercase;letter-spacing:.04em}
+.stat-value{font-size:20px;font-weight:600;color:#1a1a1a}
+
+/* 택배 버튼 영역 */
+.delivery-btn-wrap{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0}
+.btn-delivery{background:#1a1a1a;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;white-space:nowrap;transition:background .15s}
+.btn-delivery:hover{background:#333}
+.delivery-msg{font-size:11px;color:#2a8a2a;text-align:right;display:none}
+.delivery-msg.err{color:#c92d2d}
+
+/* 서브탭 */
+.sub-tabs{display:flex;border-bottom:1px solid #e8e8e4;margin-bottom:0;background:#fff;border-radius:10px 10px 0 0;padding:0 4px}
+.sub-tab{font-size:13px;padding:10px 16px;border:none;background:none;cursor:pointer;color:#999;border-bottom:2px solid transparent;margin-bottom:-1px;font-family:inherit;font-weight:500;transition:color .15s}
+.sub-tab:hover{color:#555}
+.sub-tab.active{color:#1a1a1a;border-bottom-color:#1a1a1a}
+
+/* 테이블 래퍼 */
+.tbl-wrap{background:#fff;border-radius:0 0 10px 10px;border:.5px solid #e8e8e4;border-top:none;overflow:hidden;overflow-x:auto}
+
+/* 테이블 공통 */
 table{border-collapse:collapse;font-size:13px;min-width:400px}
 table.w100{width:100%}
-td{padding:6px 10px;border-bottom:0.5px solid #f0f0ec;color:#1a1a1a;vertical-align:middle;white-space:nowrap}
-tr.design-first td{border-top:1.5px solid #e0e0db}
-.design-cell{font-weight:500;border-right:0.5px solid #f0f0ec;position:relative;padding-left:14px}
-.subtotal td{background:#fafaf8;font-weight:500}
-.spacer td{height:14px;background:#f5f5f3;border:none}
-.col-header td{background:#f9f9f7;font-size:11px;font-weight:500;color:#888;padding:7px 10px;border-bottom:0.5px solid #e8e8e4;white-space:nowrap}
+td{padding:9px 12px;border-bottom:.5px solid #f0f0ec;color:#1a1a1a;vertical-align:middle;white-space:nowrap;line-height:1.4}
+tr:last-child td{border-bottom:none}
+
+/* 디자인 탭 - 2열 나란히 */
+.design-two-col{display:flex;gap:0;width:100%}
+.design-col{flex:1;min-width:0;overflow-x:auto}
+.design-col-divider{width:24px;background:transparent;flex-shrink:0;border-left:.5px solid #e4e4e0;margin:8px 0}
+
+/* 디자인 탭 카테고리 헤더 */
+.design-category{background:#fff}
+.design-category-gap{margin-top:12px;border-top:2px solid #e8e8e4}
+.design-category-header{padding:10px 14px;font-size:12px;font-weight:600;color:#555;background:#f5f5f2;border-bottom:.5px solid #e8e8e4;display:flex;align-items:center;gap:6px;letter-spacing:.02em}
+
+/* 디자인 탭 */
+.design-group-first td{border-top:2px solid #e4e4e0}
+.design-cell{font-weight:500;border-right:.5px solid #ebebeb;position:relative;padding-left:16px;background:#fafaf8;min-width:160px}
+.color-cell{color:#666;padding-left:16px;font-size:13px;border-right:.5px solid #f0f0ec}
+.qty-cell{text-align:right;font-weight:600;color:#1a1a1a;font-variant-numeric:tabular-nums;padding-right:20px;min-width:52px}
+
+/* 옷종류 탭 */
+.spacer td{height:20px;background:#f0f0ed;border:none}
+.col-header td{background:#f2f2ef;font-size:11px;font-weight:600;color:#888;padding:8px 12px;border-bottom:.5px solid #e4e4e0;white-space:nowrap;letter-spacing:.03em}
 .col-header td.center{text-align:center}
-.center{text-align:center}
-.muted{color:#888}
-.tag{display:inline-block;font-size:10px;padding:2px 7px;border-radius:3px;margin-right:6px;vertical-align:middle;white-space:nowrap;font-weight:500}
-.card{background:#fff;border-radius:14px;border:0.5px solid #e8e8e4;padding:1.5rem;margin-bottom:1rem}
-.card-title{font-size:12px;font-weight:500;color:#888;margin-bottom:1rem;text-transform:uppercase;letter-spacing:.05em}
-.btn{width:100%;padding:12px;background:#1a1a1a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
+.type-cell{font-weight:600;border-right:.5px solid #ebebeb;vertical-align:middle;padding-left:16px;position:relative;background:#fafaf8;white-space:nowrap}
+.size-cell{text-align:center;font-variant-numeric:tabular-nums;color:#1a1a1a;min-width:40px}
+.size-cell.empty{color:#ccc}
+.subtotal-row td{background:#f2f2ef;font-weight:600;border-top:1px solid #e0e0dc;font-variant-numeric:tabular-nums}
+.subtotal-row .sub-label{text-align:right;color:#999;font-size:12px;padding-right:12px}
+.subtotal-row .sub-val{text-align:center;color:#666;font-weight:500}
+.subtotal-row .sub-total{text-align:right;color:#1a1a1a;padding-right:20px;font-size:14px}
+
+/* 카테고리 태그 */
+.tag{display:inline-block;font-size:10px;padding:2px 6px;border-radius:3px;margin-right:6px;vertical-align:middle;white-space:nowrap;font-weight:600;letter-spacing:.02em}
+
+/* 기타 카드/버튼 */
+.card{background:#fff;border-radius:10px;border:.5px solid #e8e8e4;padding:1.25rem;margin-bottom:1rem}
+.card-title{font-size:11px;font-weight:600;color:#aaa;margin-bottom:.85rem;text-transform:uppercase;letter-spacing:.06em}
+.btn{width:100%;padding:11px;background:#1a1a1a;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background .15s}
 .btn:hover{background:#333}
-.btn:disabled{background:#aaa;cursor:not-allowed}
-.result-box{border-radius:10px;padding:1rem 1.25rem;font-size:13px;margin-top:1rem;display:none}
-.result-box.success{background:#e8fbe8;color:#1a6a1a;border:0.5px solid #b0ddb0}
-.result-box.error{background:#fbe8e8;color:#8a1a1a;border:0.5px solid #ddb0b0}
+.btn:disabled{background:#ccc;cursor:not-allowed}
+.result-box{border-radius:8px;padding:.9rem 1.1rem;font-size:13px;margin-top:.85rem;display:none;line-height:1.6}
+.result-box.success{background:#f0faf0;color:#1a6a1a;border:.5px solid #b8ddb8}
+.result-box.error{background:#fdf0f0;color:#8a1a1a;border:.5px solid #ddb8b8}
+.center{text-align:center}
+.muted{color:#aaa}
 </style>
 </head>
 <body>
-<header><h1>에이블리 발주 관리</h1></header>
+
+<header><h1><i class="ti ti-package" style="font-size:18px;margin-right:8px;vertical-align:-2px" aria-hidden="true"></i>에이블리 발주 관리</h1></header>
 
 <div class="main-tabs">
-  <button class="main-tab active" onclick="switchMain(this,'order')">📊 발주 수량 정리</button>
-  <button class="main-tab" onclick="switchMain(this,'delivery')">📦 택배 변환</button>
-  <button class="main-tab" onclick="switchMain(this,'invoice')">🔖 송장 입력</button>
+  <button class="main-tab active" onclick="switchMain(this,'order')"><i class="ti ti-chart-bar" aria-hidden="true"></i> 발주 수량 정리</button>
+  <button class="main-tab" onclick="switchMain(this,'delivery')"><i class="ti ti-truck-delivery" aria-hidden="true"></i> 택배 변환</button>
+  <button class="main-tab" onclick="switchMain(this,'invoice')"><i class="ti ti-file-invoice" aria-hidden="true"></i> 송장 입력</button>
 </div>
 
 <!-- 발주 수량 정리 -->
@@ -69,7 +123,13 @@ tr.design-first td{border-top:1.5px solid #e0e0db}
     <input type="file" id="orderFile" accept=".xlsx,.xls">
   </div>
   <div id="orderResult" style="display:none">
-    <div class="stats" id="orderStats"></div>
+    <div class="top-bar">
+      <div class="stats" id="orderStats"></div>
+      <div class="delivery-btn-wrap">
+        <button class="btn-delivery" onclick="convertOrderDelivery()"><i class="ti ti-download" style="margin-right:6px" aria-hidden="true"></i>택배 접수 파일 다운로드</button>
+        <div class="delivery-msg" id="orderDeliveryResult"></div>
+      </div>
+    </div>
     <div class="sub-tabs">
       <button class="sub-tab active" onclick="switchSub(this,'design')">디자인 / 색상</button>
       <button class="sub-tab" onclick="switchSub(this,'type')">옷종류 / 색상 / 사이즈</button>
@@ -142,9 +202,9 @@ function parseOpt(optStr,f11){
 }
 function setupDrop(dropEl,fileInput,onFile){
   dropEl.addEventListener('click',()=>fileInput.click());
-  dropEl.addEventListener('dragover',e=>{e.preventDefault();dropEl.style.background='#f0f0ec';});
-  dropEl.addEventListener('dragleave',()=>{dropEl.style.background='';});
-  dropEl.addEventListener('drop',e=>{e.preventDefault();dropEl.style.background='';if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0]);});
+  dropEl.addEventListener('dragover',e=>{e.preventDefault();dropEl.classList.add('drag-over');});
+  dropEl.addEventListener('dragleave',()=>dropEl.classList.remove('drag-over'));
+  dropEl.addEventListener('drop',e=>{e.preventDefault();dropEl.classList.remove('drag-over');if(e.dataTransfer.files[0])onFile(e.dataTransfer.files[0]);});
   fileInput.addEventListener('change',e=>{if(e.target.files[0])onFile(e.target.files[0]);});
 }
 function readExcel(file,cb){
@@ -152,10 +212,15 @@ function readExcel(file,cb){
   reader.onload=e=>{const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});cb(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]]),wb);};
   reader.readAsArrayBuffer(file);
 }
-function markDrop(dropEl,fname){dropEl.classList.add('has-file');dropEl.querySelector('.drop-title').textContent=fname;dropEl.querySelector('.drop-sub').textContent='다른 파일을 선택하려면 클릭';}
+function markDrop(dropEl,fname){
+  dropEl.classList.add('has-file');
+  dropEl.querySelector('.drop-title').textContent=fname;
+  dropEl.querySelector('.drop-sub').textContent='다른 파일을 선택하려면 클릭';
+}
 
 // ── 발주 수량 정리 ──
 let orderRows=[],orderSubTab='design';
+
 setupDrop(document.getElementById('orderDrop'),document.getElementById('orderFile'),file=>{
   readExcel(file,rows=>{
     orderRows=rows;resetColors();
@@ -163,14 +228,15 @@ setupDrop(document.getElementById('orderDrop'),document.getElementById('orderFil
     rows.forEach(r=>{totalQty+=Number(r['수량'])||1;designs.add(r['상품명']);types.add(splitCode(r['판매자 상품코드']).type);});
     document.getElementById('orderStats').innerHTML=`
       <div class="stat"><div class="stat-label">총 수량</div><div class="stat-value">${totalQty}</div></div>
-      <div class="stat"><div class="stat-label">디자인 수</div><div class="stat-value">${designs.size}</div></div>
+      <div class="stat"><div class="stat-label">디자인</div><div class="stat-value">${designs.size}</div></div>
       <div class="stat"><div class="stat-label">옷 종류</div><div class="stat-value">${types.size}</div></div>
-      <div class="stat"><div class="stat-label">주문 행</div><div class="stat-value">${rows.length}</div></div>`;
+      <div class="stat"><div class="stat-label">주문</div><div class="stat-value">${rows.length}</div></div>`;
     markDrop(document.getElementById('orderDrop'),file.name);
     document.getElementById('orderResult').style.display='block';
     renderOrderTab();
   });
 });
+
 function switchSub(btn,tab){orderSubTab=tab;document.querySelectorAll('.sub-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');renderOrderTab();}
 function renderOrderTab(){orderSubTab==='design'?renderDesign():renderType();}
 
@@ -185,31 +251,59 @@ function renderDesign(){
       map[key].colors[opt.color]=(map[key].colors[opt.color]||0)+qty;
     });
   });
-  let html=`<table class="w100" id="designTable"><colgroup><col id="col-design" style="width:240px;min-width:80px"><col style="min-width:60px"><col style="width:80px"></colgroup><tbody>`;
-  Object.values(map).sort((a,b)=>a.type.localeCompare(b.type,'ko')||a.design.localeCompare(b.design,'ko')).forEach(({type,design,colors})=>{
-    const c=getCatColor(type);const cl=Object.entries(colors);
-    cl.forEach(([color,qty],i)=>{
-      const isFirst=i===0;
-      html+=`<tr class="${isFirst?'design-first':''}">`;
-      if(isFirst)html+=`<td class="design-cell" rowspan="${cl.length}" style="border-right:0.5px solid #f0f0ec"><span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:${c.bar}"></span>${tagHtml(type)}${design}</td>`;
-      html+=`<td class="muted" style="${isFirst?'border-top:1.5px solid #e0e0db':''}">${color}</td>`;
-      html+=`<td style="text-align:right;${isFirst?'border-top:1.5px solid #e0e0db':''}">${qty}</td></tr>`;
-    });
+
+  // 카테고리별로 그룹핑
+  const byType={};
+  Object.values(map).sort((a,b)=>a.type.localeCompare(b.type,'ko')||a.design.localeCompare(b.design,'ko')).forEach(item=>{
+    if(!byType[item.type])byType[item.type]=[];
+    byType[item.type].push(item);
   });
-  html+=`</tbody></table>`;
+
+  function buildRows(list){
+    return list.map(({type,design,colors})=>{
+      const c=getCatColor(type);
+      const cl=Object.entries(colors).sort((a,b)=>a[0].localeCompare(b[0],'ko'));
+      return cl.map(([color,qty],i)=>{
+        const isFirst=i===0;
+        return `<tr class="${isFirst?'design-group-first':''}">
+          ${isFirst?`<td class="design-cell" rowspan="${cl.length}" style="border-right:.5px solid #ebebeb">
+            <span style="position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:${c.bar}"></span>
+            ${design}
+          </td>`:''}
+          <td class="color-cell">${color}</td>
+          <td class="qty-cell">${qty}</td>
+        </tr>`;
+      }).join('');
+    }).join('');
+  }
+
+  let html='';
+  Object.entries(byType).forEach(([type,items],gi)=>{
+    const c=getCatColor(type);
+    const left=items.filter((_,i)=>i%2===0);
+    const right=items.filter((_,i)=>i%2===1);
+    html+=`
+      <div class="design-category${gi>0?' design-category-gap':''}">
+        <div class="design-category-header" style="border-left:3px solid ${c.bar}">
+          ${tagHtml(type)}
+        </div>
+        <div class="design-two-col">
+          <div class="design-col">
+            <table class="w100"><tbody>${buildRows(left)}</tbody></table>
+          </div>
+          <div class="design-col-divider"></div>
+          <div class="design-col">
+            <table class="w100"><tbody>${buildRows(right)}</tbody></table>
+          </div>
+        </div>
+      </div>`;
+  });
+
   document.getElementById('orderTable').innerHTML=html;
-  initResize();
 }
-function initResize(){
-  const td=document.querySelector('td.design-cell');if(!td)return;
-  const h=document.createElement('div');h.style.cssText='position:absolute;right:0;top:0;bottom:0;width:6px;cursor:col-resize;z-index:10';
-  td.appendChild(h);let sx,sw;
-  h.addEventListener('mousedown',e=>{sx=e.clientX;sw=parseInt(document.getElementById('col-design').style.width)||240;e.preventDefault();
-    const mv=e=>{document.getElementById('col-design').style.width=Math.max(80,sw+(e.clientX-sx))+'px';};
-    const up=()=>{document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);};
-    document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
-  });
-}
+
+function initResize(){} // 카드형에서 미사용
+
 function renderType(){
   const sizeOrder=['XS','S','M','L','XL','2XL','3XL'];const map={};
   orderRows.forEach(r=>{
@@ -223,39 +317,77 @@ function renderType(){
   const allSizes=new Set();
   Object.values(map).forEach(c=>Object.values(c).forEach(s=>Object.keys(s).forEach(k=>allSizes.add(k))));
   const sizes=[...allSizes].sort((a,b)=>{const ai=sizeOrder.indexOf(a),bi=sizeOrder.indexOf(b);if(ai>=0&&bi>=0)return ai-bi;if(ai>=0)return -1;if(bi>=0)return 1;return a.localeCompare(b);});
-  const hdr=()=>`<tr class="col-header"><td>옷 종류</td><td>색상</td>${sizes.map(s=>`<td class="center">${s}</td>`).join('')}<td style="text-align:right">소계</td></tr>`;
+
+  const hdr=()=>`<tr class="col-header"><td>옷 종류</td><td>색상</td>${sizes.map(s=>`<td class="center">${s}</td>`).join('')}<td style="text-align:right;padding-right:16px">소계</td></tr>`;
   let html=`<table class="w100"><tbody>`;
-  Object.keys(map).sort((a,b)=>a.localeCompare(b,'ko')).forEach((tk,idx)=>{
-    const colors=map[tk];const total=Object.values(colors).reduce((s,sz)=>s+Object.values(sz).reduce((a,b)=>a+b,0),0);
-    const tsz={};const cl=Object.entries(colors);const c=getCatColor(tk);
+  const typeKeys=Object.keys(map).sort((a,b)=>a.localeCompare(b,'ko'));
+
+  typeKeys.forEach((tk,idx)=>{
+    const colors=map[tk];
+    const typeTotal=Object.values(colors).reduce((s,sz)=>s+Object.values(sz).reduce((a,b)=>a+b,0),0);
+    const tsz={};
+    const cl=Object.entries(colors).sort((a,b)=>a[0].localeCompare(b[0],'ko'));
+    const c=getCatColor(tk);
+
     if(idx>0)html+=`<tr class="spacer"><td colspan="${2+sizes.length+1}"></td></tr>`;
-    html+=hdr();let first=true;
+    html+=hdr();
+
+    let first=true;
     cl.forEach(([color,szMap])=>{
-      const ct=Object.values(szMap).reduce((a,b)=>a+b,0);html+=`<tr>`;
-      if(first){html+=`<td rowspan="${cl.length+1}" style="font-weight:500;border-right:0.5px solid #f0f0ec;vertical-align:middle;color:${c.color};padding-left:14px;position:relative"><span style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:${c.bar}"></span>${tk}</td>`;first=false;}
-      html+=`<td class="muted">${color}</td>`;
-      sizes.forEach(s=>{const v=szMap[s]||0;tsz[s]=(tsz[s]||0)+v;html+=`<td class="center">${v||''}</td>`;});
-      html+=`<td style="text-align:right;font-weight:500">${ct}</td></tr>`;
+      const ct=Object.values(szMap).reduce((a,b)=>a+b,0);
+      html+=`<tr>`;
+      if(first){
+        html+=`<td class="type-cell" rowspan="${cl.length+1}" style="color:${c.color}">
+          <span style="position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:2px;background:${c.bar}"></span>
+          ${tk}
+        </td>`;
+        first=false;
+      }
+      html+=`<td class="color-cell">${color}</td>`;
+      sizes.forEach(s=>{const v=szMap[s]||0;tsz[s]=(tsz[s]||0)+v;html+=`<td class="${v?'size-cell':'size-cell empty'}">${v||''}</td>`;});
+      html+=`<td style="text-align:right;font-weight:600;padding-right:16px">${ct}</td></tr>`;
     });
-    html+=`<tr class="subtotal"><td class="muted" style="text-align:right">소계</td>${sizes.map(s=>`<td class="center">${tsz[s]||''}</td>`).join('')}<td style="text-align:right">${total}</td></tr>`;
+    html+=`<tr class="subtotal-row">
+      <td class="sub-label">소계</td>
+      ${sizes.map(s=>`<td class="sub-val">${tsz[s]||''}</td>`).join('')}
+      <td class="sub-total">${typeTotal}</td>
+    </tr>`;
   });
+
   html+=`</tbody></table>`;
   document.getElementById('orderTable').innerHTML=html;
 }
 
-// ── 택배 변환 ──
+// ── 발주 탭 내 택배 변환 ──
+function convertOrderDelivery(){
+  const msgEl=document.getElementById('orderDeliveryResult');
+  msgEl.className='delivery-msg';msgEl.style.display='none';
+  if(!orderRows||!orderRows.length){msgEl.className='delivery-msg err';msgEl.style.display='block';msgEl.textContent='발주 파일을 먼저 업로드해주세요.';return;}
+  try{
+    const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
+    function cleanOpt(opt){return String(opt).split('/').map(p=>{p=p.trim();return p.includes('_')?p.split('_')[0].trim():p;}).join('/');}
+    const headers=['예약구분','집하예정일','받는분성명','받는분전화번호','받는분기타연락처','받는분우편번호','받는분주소(전체, 분할)','운송장번호','고객주문번호','품목명','박스수량','박스타입','기본운임','배송메세지1','배송메세지2','품목명.1','운임구분'];
+    const wsData=[headers];
+    const sorted=[...orderRows].sort((a,b)=>{const pa=`${a['판매자 상품코드']}/${cleanOpt(a['옵션 정보'])}`;const pb=`${b['판매자 상품코드']}/${cleanOpt(b['옵션 정보'])}`;return pa.localeCompare(pb,'ko');});
+    sorted.forEach(r=>{
+      const memo=(!r['배송 메모']||String(r['배송 메모'])==='nan')?'':String(r['배송 메모']);
+      wsData.push(['',today,r['수취인명'],String(r['수취인 연락처']),'',String(r['우편번호']),r['배송지 주소'],'','',`${r['판매자 상품코드']}/${cleanOpt(r['옵션 정보'])}`,1,'극소',2000,memo,'','','']);
+    });
+    const wb2=XLSX.utils.book_new();const ws2=XLSX.utils.aoa_to_sheet(wsData);
+    ws2['!cols']=[8,12,12,16,16,12,45,14,14,45,8,8,10,20,20,10,10].map(w=>({wch:w}));
+    XLSX.utils.book_append_sheet(wb2,ws2,'택배발송');
+    XLSX.writeFile(wb2,today+'_택배발송.xlsx');
+    msgEl.className='delivery-msg';msgEl.style.display='block';msgEl.textContent=`✅ ${sorted.length}건 다운로드 완료`;
+  }catch(e){msgEl.className='delivery-msg err';msgEl.style.display='block';msgEl.textContent=`오류: ${e.message}`;}
+}
+
+// ── 택배 변환 탭 ──
 let deliveryRows=[];
 setupDrop(document.getElementById('deliveryDrop'),document.getElementById('deliveryFile'),file=>{
-  readExcel(file,rows=>{
-    deliveryRows=rows;
-    markDrop(document.getElementById('deliveryDrop'),file.name);
-    document.getElementById('convertBtn').disabled=false;
-  });
+  readExcel(file,rows=>{deliveryRows=rows;markDrop(document.getElementById('deliveryDrop'),file.name);document.getElementById('convertBtn').disabled=false;});
 });
-
 function convertDelivery(){
-  const btn=document.getElementById('convertBtn');
-  const resultEl=document.getElementById('deliveryResult');
+  const btn=document.getElementById('convertBtn');const resultEl=document.getElementById('deliveryResult');
   btn.disabled=true;btn.textContent='변환 중...';resultEl.style.display='none';
   try{
     const required=['수취인명','수취인 연락처','우편번호','배송지 주소','판매자 상품코드','옵션 정보'];
@@ -266,163 +398,101 @@ function convertDelivery(){
     function cleanOpt(opt){return String(opt).split('/').map(p=>{p=p.trim();return p.includes('_')?p.split('_')[0].trim():p;}).join('/');}
     const headers=['예약구분','집하예정일','받는분성명','받는분전화번호','받는분기타연락처','받는분우편번호','받는분주소(전체, 분할)','운송장번호','고객주문번호','품목명','박스수량','박스타입','기본운임','배송메세지1','배송메세지2','품목명.1','운임구분'];
     const wsData=[headers];
-    const sorted=[...deliveryRows].sort((a,b)=>{
-      const pa=`${a['판매자 상품코드']}/${cleanOpt(a['옵션 정보'])}`;
-      const pb=`${b['판매자 상품코드']}/${cleanOpt(b['옵션 정보'])}`;
-      return pa.localeCompare(pb,'ko');
-    });
+    const sorted=[...deliveryRows].sort((a,b)=>{const pa=`${a['판매자 상품코드']}/${cleanOpt(a['옵션 정보'])}`;const pb=`${b['판매자 상품코드']}/${cleanOpt(b['옵션 정보'])}`;return pa.localeCompare(pb,'ko');});
     sorted.forEach(r=>{
       const memo=(!r['배송 메모']||String(r['배송 메모'])==='nan')?'':String(r['배송 메모']);
       wsData.push(['',today,r['수취인명'],String(r['수취인 연락처']),'',String(r['우편번호']),r['배송지 주소'],'','',`${r['판매자 상품코드']}/${cleanOpt(r['옵션 정보'])}`,1,'극소',2000,memo,'','','']);
     });
-    const wb2=XLSX.utils.book_new();
-    const ws2=XLSX.utils.aoa_to_sheet(wsData);
+    const wb2=XLSX.utils.book_new();const ws2=XLSX.utils.aoa_to_sheet(wsData);
     ws2['!cols']=[8,12,12,16,16,12,45,14,14,45,8,8,10,20,20,10,10].map(w=>({wch:w}));
     XLSX.utils.book_append_sheet(wb2,ws2,'택배발송');
-    const outName=today+'_택배발송.xlsx';
-    XLSX.writeFile(wb2,outName);
-    resultEl.className='result-box success';
-    resultEl.innerHTML=`✅ 변환 완료! <b>${deliveryRows.length}건</b> → <b>${outName}</b> 다운로드됨`;
-  }catch(e){
-    resultEl.className='result-box error';
-    resultEl.innerHTML=`❌ 오류: ${e.message}`;
-  }
+    XLSX.writeFile(wb2,today+'_택배발송.xlsx');
+    resultEl.className='result-box success';resultEl.innerHTML=`✅ 변환 완료! <b>${sorted.length}건</b> → <b>${today}_택배발송.xlsx</b>`;
+  }catch(e){resultEl.className='result-box error';resultEl.innerHTML=`❌ 오류: ${e.message}`;}
   btn.disabled=false;btn.textContent='변환 후 다운로드';resultEl.style.display='block';
 }
 
 // ── 송장 입력 ──
-// 에이블리 발송관리 파일: 2번째 시트의 '송장번호' 컬럼에 입력
-// 송장 파일: '수취인 연락처' → '송장' 컬럼 매핑
-let invOrderWb=null, invOrderRows=[], invOrderSheetName='';
-let invInvoiceRows=[], invOrderCols=[], invInvoiceCols=[];
+let invOrderWb=null,invOrderRows=[],invOrderSheetName='';
+let invInvoiceRows=[],invOrderCols=[],invInvoiceCols=[];
 
-setupDrop(document.getElementById('invOrderDrop'), document.getElementById('invOrderFile'), file=>{
+setupDrop(document.getElementById('invOrderDrop'),document.getElementById('invOrderFile'),file=>{
   const reader=new FileReader();
   reader.onload=e=>{
-    invOrderWb = XLSX.read(new Uint8Array(e.target.result),{type:'array'});
-    // 시트가 2개 이상이면 두 번째 시트 사용, 없으면 첫 번째
-    // 단, 두 번째 시트에 '송장번호' 컬럼이 없으면 첫 번째 시트 사용
-    let sheetIdx = invOrderWb.SheetNames.length > 1 ? 1 : 0;
-    invOrderSheetName = invOrderWb.SheetNames[sheetIdx];
-    const ws = invOrderWb.Sheets[invOrderSheetName];
-    invOrderRows = XLSX.utils.sheet_to_json(ws);
-    // 헤더 직접 파싱 (json_to_sheet가 못잡는 경우 대비)
-    const range = XLSX.utils.decode_range(ws['!ref']||'A1');
-    invOrderCols = [];
-    for(let c=range.s.c; c<=range.e.c; c++){
-      const cell = ws[XLSX.utils.encode_cell({r:range.s.r, c})];
-      if(cell && cell.v !== undefined) invOrderCols.push(String(cell.v));
-    }
-    markDrop(document.getElementById('invOrderDrop'), file.name + ` (시트: ${invOrderSheetName}, ${invOrderCols.length}개 컬럼)`);
+    invOrderWb=XLSX.read(new Uint8Array(e.target.result),{type:'array'});
+    let sheetIdx=invOrderWb.SheetNames.length>1?1:0;
+    invOrderSheetName=invOrderWb.SheetNames[sheetIdx];
+    const ws=invOrderWb.Sheets[invOrderSheetName];
+    invOrderRows=XLSX.utils.sheet_to_json(ws);
+    const range=XLSX.utils.decode_range(ws['!ref']||'A1');
+    invOrderCols=[];
+    for(let c=range.s.c;c<=range.e.c;c++){const cell=ws[XLSX.utils.encode_cell({r:range.s.r,c})];if(cell&&cell.v!==undefined)invOrderCols.push(String(cell.v));}
+    markDrop(document.getElementById('invOrderDrop'),file.name+` (${invOrderSheetName}, ${invOrderCols.length}개 컬럼)`);
     updateInvMatchCard();
   };
   reader.readAsArrayBuffer(file);
 });
 
-setupDrop(document.getElementById('invInvoiceDrop'), document.getElementById('invInvoiceFile'), file=>{
-  readExcel(file, rows=>{
-    invInvoiceRows=rows;
-    invInvoiceCols=Object.keys(rows[0]||{});
-    markDrop(document.getElementById('invInvoiceDrop'), file.name);
-    updateInvMatchCard();
-  });
+setupDrop(document.getElementById('invInvoiceDrop'),document.getElementById('invInvoiceFile'),file=>{
+  readExcel(file,rows=>{invInvoiceRows=rows;invInvoiceCols=Object.keys(rows[0]||{});markDrop(document.getElementById('invInvoiceDrop'),file.name);updateInvMatchCard();});
 });
 
 function updateInvMatchCard(){
-  if(!invOrderRows.length || !invInvoiceRows.length) return;
-
-  const hasSongjanCol = invOrderCols.includes('송장번호');
-  const hasOrderKey   = invOrderCols.includes('수취인 연락처');
-  const hasInvoiceKey = invInvoiceCols.includes('받는분전화번호');
-  const hasInvoiceNum = invInvoiceCols.includes('운송장번호');
-  const sheetInfo = invOrderWb && invOrderWb.SheetNames.length > 1 ? ` (${invOrderSheetName} 시트)` : '';
-
-  const lines = [
-    `<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">`,
-    `<div>📋 발주 파일 키: <b>수취인 연락처</b> ${hasOrderKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
-    `<div>🔖 송장 파일 키: <b>받는분전화번호</b> ${hasInvoiceKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
-    `<div>📦 송장번호 컬럼: <b>운송장번호</b> ${hasInvoiceNum ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
-    `<div style="margin-top:4px;padding-top:8px;border-top:.5px solid #eee">`,
-    hasSongjanCol
-      ? `✅ 발주 파일${sheetInfo}의 <b>송장번호</b> 컬럼에 자동 입력됩니다.`
-      : `➕ 발주 파일${sheetInfo}에 <b>송장번호</b> 컬럼을 추가합니다.`,
-    `</div></div>`
-  ];
-
+  if(!invOrderRows.length||!invInvoiceRows.length)return;
+  const hasSongjanCol=invOrderCols.includes('송장번호');
+  const hasOrderKey=invOrderCols.includes('수취인 연락처');
+  const hasInvoiceKey=invInvoiceCols.includes('받는분전화번호');
+  const hasInvoiceNum=invInvoiceCols.includes('운송장번호');
+  const sheetInfo=invOrderWb&&invOrderWb.SheetNames.length>1?` (${invOrderSheetName} 시트)`:'';
+  const ok=v=>v?'<span style="color:#2a8a2a">✅</span>':'<span style="color:#c92d2d">⚠ 없음</span>';
   document.getElementById('invMatchCard').style.display='block';
-  document.getElementById('invMatchStatus').innerHTML = lines.join('');
-  document.getElementById('invMergeBtn').disabled = !(hasOrderKey && hasInvoiceKey && hasInvoiceNum);
+  document.getElementById('invMatchStatus').innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:13px">
+      <div>📋 발주 파일 키 <b>수취인 연락처</b> ${ok(hasOrderKey)}</div>
+      <div>🔖 송장 파일 키 <b>받는분전화번호</b> ${ok(hasInvoiceKey)}</div>
+      <div>📦 송장번호 컬럼 <b>운송장번호</b> ${ok(hasInvoiceNum)}</div>
+      <div style="margin-top:4px;padding-top:8px;border-top:.5px solid #eee;color:#555">
+        ${hasSongjanCol?`✅ 발주 파일${sheetInfo}의 <b>송장번호</b> 컬럼에 자동 입력됩니다.`:`➕ 발주 파일${sheetInfo}에 <b>송장번호</b> 컬럼을 추가합니다.`}
+      </div>
+    </div>`;
+  document.getElementById('invMergeBtn').disabled=!(hasOrderKey&&hasInvoiceKey&&hasInvoiceNum);
 }
 
 function mergeInvoice(){
-  const btn=document.getElementById('invMergeBtn');
-  const resultEl=document.getElementById('invResult');
-  btn.disabled=true; btn.textContent='처리 중...'; resultEl.style.display='none';
-
+  const btn=document.getElementById('invMergeBtn');const resultEl=document.getElementById('invResult');
+  btn.disabled=true;btn.textContent='처리 중...';resultEl.style.display='none';
   try{
-    // 고정값
-    const orderKey = '수취인 연락처';
-    const invoiceKey = '받는분전화번호';
-    const invoiceNumCol = '운송장번호';
-
-    // 송장 파일에서 키→송장번호 맵 생성 (하이픈/공백 제거 후 매칭)
-    const invoiceMap = {};
+    const orderKey='수취인 연락처';const invoiceKey='받는분전화번호';const invoiceNumCol='운송장번호';
+    const invoiceMap={};
     invInvoiceRows.forEach(r=>{
-      const key = String(r[invoiceKey]||'').replace(/[-\s]/g,'');
-      const num = String(r[invoiceNumCol]||'').replace(/[^0-9]/g,'');
-      if(key && num && num!=='undefined' && num!=='nan') invoiceMap[key] = num;
+      const key=String(r[invoiceKey]||'').replace(/[-\s]/g,'');
+      const num=String(r[invoiceNumCol]||'').replace(/[^0-9]/g,'');
+      if(key&&num&&num!=='undefined'&&num!=='nan')invoiceMap[key]=num;
     });
-
-    let matched=0, unmatched=0;
-
-    // 발송관리 파일: 원본 워크북의 해당 시트를 직접 수정
-    const ws = invOrderWb.Sheets[invOrderSheetName];
-    const range = XLSX.utils.decode_range(ws['!ref']);
-
-    // 헤더 행에서 '수취인 연락처', '송장번호' 컬럼 인덱스 찾기
-    let orderKeyColIdx = -1, invoiceColIdx = -1;
-    for(let c=range.s.c; c<=range.e.c; c++){
-      const cell = ws[XLSX.utils.encode_cell({r:range.s.r, c})];
-      if(cell && cell.v === orderKey) orderKeyColIdx = c;
-      if(cell && cell.v === '송장번호') invoiceColIdx = c;
+    let matched=0,unmatched=0;
+    const ws=invOrderWb.Sheets[invOrderSheetName];
+    const range=XLSX.utils.decode_range(ws['!ref']);
+    let orderKeyColIdx=-1,invoiceColIdx=-1;
+    for(let c=range.s.c;c<=range.e.c;c++){
+      const cell=ws[XLSX.utils.encode_cell({r:range.s.r,c})];
+      if(cell&&cell.v===orderKey)orderKeyColIdx=c;
+      if(cell&&cell.v==='송장번호')invoiceColIdx=c;
     }
-
-    // 송장번호 컬럼이 없으면 마지막 열에 추가
-    if(invoiceColIdx < 0){
-      invoiceColIdx = range.e.c + 1;
-      ws[XLSX.utils.encode_cell({r:range.s.r, c:invoiceColIdx})] = {v:'송장번호', t:'s'};
-      range.e.c = invoiceColIdx;
-      ws['!ref'] = XLSX.utils.encode_range(range);
+    if(invoiceColIdx<0){invoiceColIdx=range.e.c+1;ws[XLSX.utils.encode_cell({r:range.s.r,c:invoiceColIdx})]={v:'송장번호',t:'s'};range.e.c=invoiceColIdx;ws['!ref']=XLSX.utils.encode_range(range);}
+    for(let r=range.s.r+1;r<=range.e.r;r++){
+      if(orderKeyColIdx<0)break;
+      const keyCell=ws[XLSX.utils.encode_cell({r,c:orderKeyColIdx})];if(!keyCell)continue;
+      const key=String(keyCell.v||'').replace(/[-\s]/g,'');
+      const invNum=invoiceMap[key];
+      if(invNum){ws[XLSX.utils.encode_cell({r,c:invoiceColIdx})]={v:invNum,t:'s'};matched++;}else{unmatched++;}
     }
-
-    // 데이터 행 순회하며 송장번호 입력
-    for(let r=range.s.r+1; r<=range.e.r; r++){
-      if(orderKeyColIdx < 0) break;
-      const keyCell = ws[XLSX.utils.encode_cell({r, c:orderKeyColIdx})];
-      if(!keyCell) continue;
-      const key = String(keyCell.v||'').replace(/[-\s]/g,'');
-      const invNum = invoiceMap[key];
-      if(invNum){
-        ws[XLSX.utils.encode_cell({r, c:invoiceColIdx})] = {v:invNum, t:'s'};
-        matched++;
-      } else {
-        unmatched++;
-      }
-    }
-
-    // 원본 파일 구조 유지하여 저장 (모든 시트 포함)
     const today=new Date().toISOString().slice(0,10).replace(/-/g,'');
     const outName=`${today}_에이블리_발송_송장.xlsx`;
-    XLSX.writeFile(invOrderWb, outName);
-
+    XLSX.writeFile(invOrderWb,outName);
     resultEl.className='result-box success';
-    resultEl.innerHTML=`✅ 완료! 매칭 <b>${matched}건</b> / 미매칭 <b style="color:#c97a00">${unmatched}건</b><br><span style="font-size:12px">→ <b>${outName}</b> 다운로드됨 (원본 시트 구조 유지)</span>`;
-  }catch(e){
-    resultEl.className='result-box error';
-    resultEl.innerHTML=`❌ 오류: ${e.message}`;
-  }
-  btn.disabled=false; btn.textContent='송장번호 입력 후 다운로드';
-  resultEl.style.display='block';
+    resultEl.innerHTML=`✅ 완료! 매칭 <b>${matched}건</b> / 미매칭 <b style="color:#c97a00">${unmatched}건</b><br><span style="font-size:12px">→ <b>${outName}</b> 다운로드됨</span>`;
+  }catch(e){resultEl.className='result-box error';resultEl.innerHTML=`❌ 오류: ${e.message}`;}
+  btn.disabled=false;btn.textContent='송장번호 입력 후 다운로드';resultEl.style.display='block';
 }
 </script>
 </body>
