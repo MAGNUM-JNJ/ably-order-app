@@ -301,7 +301,8 @@ setupDrop(document.getElementById('invOrderDrop'), document.getElementById('invO
   reader.onload=e=>{
     invOrderWb = XLSX.read(new Uint8Array(e.target.result),{type:'array'});
     // 시트가 2개 이상이면 두 번째 시트 사용, 없으면 첫 번째
-    const sheetIdx = invOrderWb.SheetNames.length > 1 ? 1 : 0;
+    // 단, 두 번째 시트에 '송장번호' 컬럼이 없으면 첫 번째 시트 사용
+    let sheetIdx = invOrderWb.SheetNames.length > 1 ? 1 : 0;
     invOrderSheetName = invOrderWb.SheetNames[sheetIdx];
     const ws = invOrderWb.Sheets[invOrderSheetName];
     invOrderRows = XLSX.utils.sheet_to_json(ws);
@@ -333,14 +334,14 @@ function updateInvMatchCard(){
   const hasSongjanCol = invOrderCols.includes('송장번호');
   const hasOrderKey   = invOrderCols.includes('수취인 연락처');
   const hasInvoiceKey = invInvoiceCols.includes('받는분전화번호');
-  const hasInvoiceNum = invInvoiceCols.includes('송장');
+  const hasInvoiceNum = invInvoiceCols.includes('운송장번호');
   const sheetInfo = invOrderWb && invOrderWb.SheetNames.length > 1 ? ` (${invOrderSheetName} 시트)` : '';
 
   const lines = [
     `<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">`,
     `<div>📋 발주 파일 키: <b>수취인 연락처</b> ${hasOrderKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
     `<div>🔖 송장 파일 키: <b>받는분전화번호</b> ${hasInvoiceKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
-    `<div>📦 송장번호 컬럼: <b>송장</b> ${hasInvoiceNum ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
+    `<div>📦 송장번호 컬럼: <b>운송장번호</b> ${hasInvoiceNum ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
     `<div style="margin-top:4px;padding-top:8px;border-top:.5px solid #eee">`,
     hasSongjanCol
       ? `✅ 발주 파일${sheetInfo}의 <b>송장번호</b> 컬럼에 자동 입력됩니다.`
@@ -362,7 +363,7 @@ function mergeInvoice(){
     // 고정값
     const orderKey = '수취인 연락처';
     const invoiceKey = '받는분전화번호';
-    const invoiceNumCol = '송장';
+    const invoiceNumCol = '운송장번호';
 
     // 송장 파일에서 키→송장번호 맵 생성 (하이픈/공백 제거 후 매칭)
     const invoiceMap = {};
