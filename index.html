@@ -332,14 +332,14 @@ function updateInvMatchCard(){
 
   const hasSongjanCol = invOrderCols.includes('송장번호');
   const hasOrderKey   = invOrderCols.includes('수취인 연락처');
-  const hasInvoiceKey = invInvoiceCols.includes('수취인 연락처');
+  const hasInvoiceKey = invInvoiceCols.includes('받는분전화번호');
   const hasInvoiceNum = invInvoiceCols.includes('송장');
   const sheetInfo = invOrderWb && invOrderWb.SheetNames.length > 1 ? ` (${invOrderSheetName} 시트)` : '';
 
   const lines = [
     `<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">`,
     `<div>📋 발주 파일 키: <b>수취인 연락처</b> ${hasOrderKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
-    `<div>🔖 송장 파일 키: <b>수취인 연락처</b> ${hasInvoiceKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
+    `<div>🔖 송장 파일 키: <b>받는분전화번호</b> ${hasInvoiceKey ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
     `<div>📦 송장번호 컬럼: <b>송장</b> ${hasInvoiceNum ? '✅' : '<span style="color:#c92d2d">⚠ 컬럼 없음</span>'}</div>`,
     `<div style="margin-top:4px;padding-top:8px;border-top:.5px solid #eee">`,
     hasSongjanCol
@@ -361,7 +361,7 @@ function mergeInvoice(){
   try{
     // 고정값
     const orderKey = '수취인 연락처';
-    const invoiceKey = '수취인 연락처';
+    const invoiceKey = '받는분전화번호';
     const invoiceNumCol = '송장';
 
     // 송장 파일에서 키→송장번호 맵 생성 (하이픈/공백 제거 후 매칭)
